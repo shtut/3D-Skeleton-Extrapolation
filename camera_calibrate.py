@@ -26,8 +26,8 @@ class StereoCalibration(object):
         self.read_images(self.cal_path)
 
     def read_images(self, cal_path):
-        images_right = glob.glob(cal_path + 'right*.jpg')
-        images_left = glob.glob(cal_path + 'left*.jpg')
+        images_right = glob.glob(cal_path + '*ight*.*')
+        images_left = glob.glob(cal_path + '*eft*.*')
         images_left.sort()
         images_right.sort()
         # print(images_left)
@@ -71,6 +71,7 @@ class StereoCalibration(object):
                     cv2.imshow(images_right[i], img_r)
                     cv2.waitKey(500)
             img_shape = gray_l.shape[::-1]
+            # print(gray_l.shape, img_shape)
 
         rt, self.M1, self.d1, self.r1, self.t1 = cv2.calibrateCamera(
             self.objpoints, self.imgpoints_l, img_shape, None, None)
@@ -128,7 +129,9 @@ class StereoCalibration(object):
         return camera_model
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('filepath', help='String Filepath')
-    args = parser.parse_args()
-    cal_data = StereoCalibration(args.filepath)
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument('filepath', help='String Filepath')
+    # args = parser.parse_args()
+    # cal_data = StereoCalibration(args.filepath)
+    thing = StereoCalibration(r'Z:\intermitent data\frames\\', False)
+    # thing = StereoCalibration(r'E:\cygwin64\home\Alex\git\3D-Skeleton-Extrapolation\opevCV_checkerboard\\', False)
