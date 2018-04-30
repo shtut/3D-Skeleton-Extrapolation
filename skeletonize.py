@@ -1,21 +1,28 @@
-import camera_calibrate
+# Alex Nulam, Dvir Segal and Hadas Shahar [30-Apr-18]
+# This python script generates a list of equal skeleton points from 2 images (left and right)
+# The points are exported as mat file
+
 import numpy as np
-import cv2
 import sys
-#adjust this to reflect where you have tf-openpose
-sys.path.append('E:\\cygwin64\\home\\Alex\\git\\tf-openpose')
-sys.path.append('E:\\cygwin64\\home\\Alex\\git\\tf-openpose\\src')
+
+# adjust this to reflect where you have tf-openpose
+sys.path.append(r'../tf-pose-estimation')
+sys.path.append(r'../tf-pose-estimation/src')
 import common
 from estimator import TfPoseEstimator
 from networks import get_graph_path, model_wh
 import ast
-# import matplotlib.pyplot as plt
 import scipy.io as sio
 
-#disable scientific notation
+# disable scientific notation
 np.set_printoptions(suppress=True)
 
+
 def prep_model():
+    """
+    This method init an OpenPose model
+    :return: return a {estimator , scales}
+    """
     args = type('', (), {})
     args.resolution = '432x368'
     args.model = 'mobilenet_thin'
@@ -25,76 +32,60 @@ def prep_model():
     e = TfPoseEstimator(get_graph_path(args.model), target_size=(w, h))
     return {'e': e, 'scales': scales}
 
+
 def get_skeleton(im, e, scales, shape=None):
+    """
+    This method returns a list of skeletons per given image
+    :param im: given image
+    :param e: estimator (tf-pose estimator)
+    :param scales:
+    :param shape: image shape
+    :return: return a list of skeletons
+    """
     # estimate human poses from a single image !
     image = common.read_imgfile(im, None, None)
     if shape is not None:
         shape.clear()
         shape.extend(image.shape[:-1])
-    humans = e.inference(image, scales=scales) #list of skeletons
-    # image = TfPoseEstimator.draw_humans(image, humans, imgcopy=False) #"draws" the skeletons on the image
+    humans = e.inference(image, scales=scales)  # list of skeletons
     return humans
 
-#the path here should point to the directory with the calibration pics
-calibration = camera_calibrate.StereoCalibration(r'Z:\intermitent data\frames\\', False)
 
-A_RT_left = calibration.camera_model['M1'].dot(
-    np.hstack([calibration.camera_model['R'], calibration.camera_model['T']]))
-A_RT_right = calibration.camera_model['M2'].dot(
-    np.hstack([calibration.camera_model['R'], calibration.camera_model['T']]))
-
-
+# get the model
 model = prep_model()
+
 im_shape = []
-lhumans = get_skeleton(r'Z:\intermitent data\poses\L_pose1.png', shape=im_shape, **model)
-rhumans = get_skeleton(r'Z:\intermitent data\poses\R_pose1.png', **model)
-lparts = []
-rparts = []
+# change path to whatever image you would like to skeletonize using OpenPose
+left_image_humans = get_skeleton(r'Data\intermitent data\poses\L_pose1.png', shape=im_shape, **model)
+# change path to whatever image you would like to skeletonize using OpenPose
+right_image_humans = get_skeleton(r'Data\intermitent data\poses\R_pose1.png', **model)
+
+left_image_parts = []
+right_image_parts = []
 indexes = {}
 i = 0
-for matching_part in list(set(rhumans[0].body_parts.keys()).intersection(lhumans[0].body_parts.keys())):
-# for matching_part in [0, 1]:
-    #maybe undistort before appending?
-    rparts.append([rhumans[0].body_parts[matching_part].x,
-                   rhumans[0].body_parts[matching_part].y])
-    lparts.append([lhumans[0].body_parts[matching_part].x,
-                   lhumans[0].body_parts[matching_part].y])
-    k = rhumans[0].body_parts[matching_part].get_part_name()
+for matching_part in list(
+        set(right_image_humans[0].body_parts.keys()).intersection(left_image_humans[0].body_parts.keys())):
+    # for matching_part in [0, 1]:
+    right_image_parts.append([right_image_humans[0].body_parts[matching_part].x,
+                              right_image_humans[0].body_parts[matching_part].y])
+    left_image_parts.append([left_image_humans[0].body_parts[matching_part].x,
+                             left_image_humans[0].body_parts[matching_part].y])
+    k = right_image_humans[0].body_parts[matching_part].get_part_name()
     indexes[k.value] = i
     i += 1
 
+left_image_parts = np.array(left_image_parts).T
+right_image_parts = np.array(right_image_parts).T
 
-lparts = np.array(lparts).T #* [[im_shape[0]], [im_shape[1]]]
-rparts = np.array(rparts).T #* [[im_shape[0]], [im_shape[1]]]
-lparts1 = np.array([lparts[0] * [im_shape[0]], lparts[1]*[im_shape[1]]]).T
-rparts1 = np.array([rparts[0] * [im_shape[0]], rparts[1]*[im_shape[1]]]).T
-
-# triangulated_4d = cv2.triangulatePoints(A_RT_left, A_RT_right, lparts, rparts)
-# triangulated_4d = cv2.triangulatePoints(np.eye(4)[:3], A_RT_right, lparts, rparts)
-# triangulated_4d = triangulated_4d/triangulated_4d[3]
-# triangulated_3d = triangulated_4d[:-1].T
-
-# triangulated_3d = triangulated_4d[:, :3] / triangulated_4d[:, -1, np.newaxis]
-# print(str(triangulated_3d).replace('[', '').replace(']','').replace('\n  ', '\n')
-#       .replace('  ', ' ').replace(' ', ', ')[2:])
-
-#todo investigate https://github.com/markjay4k/3D-Pose-Estimation/blob/master/pt4-webcam3D.py and his use of Prob3dPose
-#todo which i think comes from https://github.com/DenisTome/Lifting-from-the-Deep-release
-
-
-lpoints = []
-rpoints = []
-for x,y in common.CocoPairsRender:
+# Right left and right points to mat file
+leftPoints = []
+rightPoints = []
+for x, y in common.CocoPairsRender:
     if x in indexes and y in indexes:
-        lpoints.append(lparts.T[indexes[x]].tolist())
-        lpoints.append(lparts.T[indexes[y]].tolist())
-        rpoints.append(rparts.T[indexes[x]].tolist())
-        rpoints.append(rparts.T[indexes[y]].tolist())
+        leftPoints.append(left_image_parts.T[indexes[x]].tolist())
+        leftPoints.append(left_image_parts.T[indexes[y]].tolist())
+        rightPoints.append(right_image_parts.T[indexes[x]].tolist())
+        rightPoints.append(right_image_parts.T[indexes[y]].tolist())
 
-# r = Tk()
-# r.withdraw()
-# r.clipboard_clear()
-# r.clipboard_append(str(rpoints).replace('],', '],\n'))
-# r.clipboard_clear()
-# r.clipboard_append(str(lpoints).replace('],', '],\n'))
-sio.savemat('thingy.m', {'l':lpoints, 'r':rpoints})
+sio.savemat('lr', {'l': leftPoints, 'r': rightPoints})
