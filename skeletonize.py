@@ -1,6 +1,9 @@
-# Alex Nulam, Dvir Segal and Hadas Shahar [30-Apr-18]
+# Alex Nulman, Dvir Segal and Hadas Shahar [30-Apr-18]
 # This python script generates a list of equal skeleton points from 2 images (left and right)
 # The points are exported as mat file
+
+# Then points are used by matlab skeletonize script which triangulate the left and right skeletons from mat file
+# At the end a 3D skeleton plotted
 
 import numpy as np
 import sys
@@ -13,9 +16,13 @@ from estimator import TfPoseEstimator
 from networks import get_graph_path, model_wh
 import ast
 import scipy.io as sio
+import matlab.engine
 
 # disable scientific notation
 np.set_printoptions(suppress=True)
+
+# this line starts matlab in the background so it takes a while
+eng = matlab.engine.start_matlab()
 
 
 def prep_model():
@@ -89,3 +96,6 @@ for x, y in common.CocoPairsRender:
         rightPoints.append(right_image_parts.T[indexes[y]].tolist())
 
 sio.savemat('lr', {'l': leftPoints, 'r': rightPoints})
+# run matlab script from python
+eng.skeletonize(nargout=0)
+input()
