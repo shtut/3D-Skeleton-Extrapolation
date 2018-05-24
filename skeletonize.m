@@ -21,3 +21,6 @@ for elm = transpose(cat(2, q1,q2))
     hold on
 end
 
+ax = gca;
+props = {'CameraViewAngle','DataAspectRatio','PlotBoxAspectRatio'};
+set(ax,props,get(ax,props));
