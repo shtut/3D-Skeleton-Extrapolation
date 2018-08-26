@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<head>
+  <title>3D ROM</title>
+  <meta charset="utf-8">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href = "http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <link rel="icon" type="image/png" href="http://png-5.findicons.com/files/icons/1017/round_theme/59/camera.png">
+  
+	<style>
+	body {
+		//background-color: #003399;
+		background-image: url('https://newevolutiondesigns.com/images/freebies/polygon-wallpaper-12.jpg');
+		background-size: 100%;
+		color: white;
+	}
+	h1 {
+		color: white;
+		font-weight: bold;
+		margin-left: -3em;
+		font-size:400%;
+	}
+	
+	h2 {
+		color: white;
+		font-weight: bold;
+		margin-left: -1em;
+	}
+	.row {
+		background-color:rgba(0, 0, 0, 0.6);
+		border-right-style: solid;
+		border-left-style: solid;
+		border-width: thick;
+		border-color: white;
+		padding-bottom: 100%;
+		margin-bottom: -100%;
+		overflow-y: hidden;
+	}
+	</style>
+  
+</head>
+
+<body>
+
+
+
+<div class="container">
+		<div class="row">
+		
+		<div class="col-md-2"></div>
+		
+		<div class="col-md-8">
+		<h1>3D skeleton extrapolation</h1>
+		<img src="">
+
+		<h2>Abstract:</h2>
+
+		<p>Our aim is to create a system that can generate a 3D
+		skeleton from 2 RGB images,enough to match the Kinect’s 3D skeleton capabilities,and perhaps surpass them.</p>
+
+
+		<h2>Technologies:</h2>
+		<ul>
+			<li>OpenPose</li>
+			<li>OpeCV (Python)</li>
+			<li>MATLAB</li>
+		</ul>
+		<h2>Steps:</h2>
+
+		<p>To do so,  we utilized OpenPose and stereo triangulation.</p>
+		<ul>
+			<li>Set up a stereo system – perform calibration to get the extrinsic and intrinsic matrices of both cameras</li>
+			<li>Run OpenPose on the 2 cameras’ images,  and get the 2D skeleton</li>
+			<li>Using the calibration matrices, triangulate the joints’ location in 3D space</li>
+			<li>Compare our generated skeleton to the Kinect's 'ground truth'</li>
+		</ul>
+
+
+		<h2>Demo:</h2>
+		<p>Camera Calibraion</p>
+		<img height="200" src="website_media/Left2.png"><img height="200" src="website_media/Right2.png">
+		<img height="200" src="website_media/Left1.png"><img height="200" src="website_media/Right1.png">
+		<img height="200" src="website_media/Left4.png"><img height="200" src="website_media/Right4.png">
+		<video controls width="600">
+			<source src="website_media/calibration_demo.mp4" type="video/mp4">
+		</video>
+		<p>Skeleton Creation</p>
+		
+		<img height="200" src="website_media/Left11.png"><img height="200" src="website_media/Right11.png">
+		<br>
+		<img height="200" src="website_media/openpose.png">
+		<video controls width="600">
+			<source src="website_media/skeleton_demo.mp4" type="video/mp4">
+		</video>
+		
+		<p>Compare to Kinect:</p>
+		<video controls width="600">
+			<source src="website_media/compare_demo.mp4" type="video/mp4">
+		</video>
+		</div>
+			
+		<div class="col-md-2"></div>
+		
+		</div>
+</div>
+
+</body>
+</html>
