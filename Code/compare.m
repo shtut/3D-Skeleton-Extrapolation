@@ -12,27 +12,27 @@ kinect = load(fig2);
 OpenPoseSkeleton3D = OpenPoseSkeleton3D - OpenPoseSkeleton3D(1:1,:);
 
 % Split points to start and end points
-OP_start = OpenPoseSkeleton3D(1:2:end,:);
-OP_end = OpenPoseSkeleton3D(2:2:end,:);
+OP_start2 = OpenPoseSkeleton3D(1:2:end,:);
+OP_end2 = OpenPoseSkeleton3D(2:2:end,:);
 
 kinect_start = kinect.lines(1:2:end,:);
 kinect_end = kinect.lines(2:2:end,:);
 
-orderK = cellstr(kinect.order);
-orderOP = cellstr(orderOP);
-% % get kinect and openpose left foot point
-Kfoot = kinect.lines(find(contains(orderK,"FootLeft"),1,'first'),:);
-OPfoot = OpenPoseSkeleton3D(find(contains(orderOP,"LAnkle"),1,'first'),:);
-% find the rotation matrix
-r = vrrotvec(Kfoot,OPfoot);
-m = vrrotvec2mat(r);
-OP_end2 = OP_end * m; OP_start2 = OP_start * m;
-% 
-% find the scaling factor
-OPfoot_postR = OPfoot * m;
-Kfoot_postR = Kfoot * m;
-scale = (norm(Kfoot_postR - [0,0,0]))/(norm(OPfoot_postR - [0,0,0]));
-OP_end2 = OP_end2 * scale; OP_start2 = OP_start2 * scale;
+% orderK = cellstr(kinect.order);
+% orderOP = cellstr(orderOP);
+% % % get kinect and openpose left foot point
+% Kfoot = kinect.lines(find(contains(orderK,"FootLeft"),1,'first'),:);
+% OPfoot = OpenPoseSkeleton3D(find(contains(orderOP,"LAnkle"),1,'first'),:);
+% % find the rotation matrix
+% r = vrrotvec(Kfoot,OPfoot);
+% m = vrrotvec2mat(r);
+% OP_end2 = OP_end * m; OP_start2 = OP_start * m;
+% % 
+% % find the scaling factor
+% OPfoot_postR = OPfoot * m;
+% Kfoot_postR = Kfoot * m;
+% scale = (norm(Kfoot_postR - [0,0,0]))/(norm(OPfoot_postR - [0,0,0]));
+% OP_end2 = OP_end2 * scale; OP_start2 = OP_start2 * scale;
 
 % Concat each start and end point to [[start, end] ,...[start, end]] list
 %  then  plot 3D points on viewer with 
@@ -44,11 +44,11 @@ for elm = transpose(cat(2, OP_start2,OP_end2))
 	hold on;
 	grid on;
     % height limited to +/-3m, width to +/-2m, depth to +/-1m
-    axis([-2 2 -3 3 -1 1]);
+    axis([-5 5 -5 5 -5 5]);
 end
 for elm = transpose(cat(2, kinect_start,kinect_end))
     plot3([elm(1);elm(4)], [elm(2);elm(5)], [elm(3);elm(6)],  'Color', [51, 153, 255] / 255, 'MarkerSize', 30, 'LineWidth', 3);
     scatter3([elm(1);elm(4)], [elm(2);elm(5)], [elm(3);elm(6)],'MarkerFaceColor',[51, 153, 255] / 255, 'MarkerEdgeColor','none');
 	hold on; grid on;
-    axis([-2 2 -3 3 -1 1]);
+    axis([-5 5 -5 5 -5 5]);
 end

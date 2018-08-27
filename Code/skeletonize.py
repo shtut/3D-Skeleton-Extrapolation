@@ -14,9 +14,11 @@ import kinect_mapping
 
 # adjust this to reflect where you have tf-openpose
 # sys.path.append(r'../tf-openpose')
-sys.path.append(r'../../tf-openpose/src')
-sys.path.append(r'../tf-openpose/src')
-sys.path.append(r'tf-openpose/src')
+# sys.path.append(r'../../tf-openpose/src')
+# sys.path.append(r'../tf-openpose/src')
+# sys.path.append(r'tf-openpose/src')
+sys.path.append(r'E:\cygwin64\home\Alex\git\tf-openpose\src')
+sys.path.append(r'E:\cygwin64\home\Alex\git\tf-openpose')
 import common
 from estimator import TfPoseEstimator
 from networks import get_graph_path, model_wh
@@ -33,8 +35,9 @@ class Skeletonizer(object):
         This method init an OpenPose model
         """
         args = type('', (), {})
-        args.resolution = '432x368'
-        args.model = 'mobilenet_thin'
+        # args.resolution = '1312x736'
+        args.resolution = '656x368'
+        args.model = 'cmu'
         args.scales = '[None]'
         scales = ast.literal_eval(args.scales)
         w, h = model_wh(args.resolution)
@@ -157,10 +160,10 @@ class Skeletonizer(object):
 
 if __name__ == '__main__':
     # perpare the file inputs
-    im1 = r'../data/L_pose1.png'
-    im2 = r'../data/R_pose1.png'
-    kinect_text = r'../data/kinect_pose1_-8586705244883231734%940119195274.TXT'
-    calibration = 'example/calibration.mat'
+    im1 = r'../data/Original/Test/2/-8586670814794339271%1457984245925.png'
+    im2 = r'../data/Original/Test/2/-8586670814803766057%2226553340049.png'
+    kinect_text = r'../data/Original/Test/2/-8586670814803766057%2226553277549.TXT'
+    calibration = 'example/aug17_stereoParams.mat'
 
     #initilize our class and matlab engine (runs headless matlab)
     sk = Skeletonizer(calibration)
