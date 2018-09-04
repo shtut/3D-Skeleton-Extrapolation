@@ -73,6 +73,7 @@ class Skeletonizer(object):
             shape.clear()
             shape.extend(image.shape[:-1])
         humans = self.model['e'].inference(image, scales=self.model['scales'])  # list of skeletons
+		
         return humans
 
     def prepare_op_data(self, im1, im2, output_name='OpenPoseMat'):
@@ -93,16 +94,19 @@ class Skeletonizer(object):
         right_image_parts = []
         indexes = {}
         i = 0
+		
+		# assuming im1 and im2 are the same size
+		height,width,_ = cv2.imread(im1).shape
 
         part_order = []
         part_order_vis = []
         for matching_part in list(
                 set(right_image_humans[0].body_parts.keys()).intersection(left_image_humans[0].body_parts.keys())):
             # for matching_part in [0, 1]:
-            right_image_parts.append([right_image_humans[0].body_parts[matching_part].x,
-                                      right_image_humans[0].body_parts[matching_part].y])
-            left_image_parts.append([left_image_humans[0].body_parts[matching_part].x,
-                                     left_image_humans[0].body_parts[matching_part].y])
+            right_image_parts.append([right_image_humans[0].body_parts[matching_part].x * width/1000,
+                                      right_image_humans[0].body_parts[matching_part].y * height/1000])
+            left_image_parts.append([left_image_humans[0].body_parts[matching_part].x * width/1000,
+                                     left_image_humans[0].body_parts[matching_part].y * height/1000])
             k = right_image_humans[0].body_parts[matching_part].get_part_name()
             indexes[k.value] = i
             part_order.append(k.name)
