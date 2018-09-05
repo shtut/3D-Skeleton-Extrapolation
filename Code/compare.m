@@ -70,7 +70,14 @@ kinectmatch = kinectmatch - center;
 [n,x] = size(OpenPoseSkeleton3D);
 openpose_transformed = (ret_R*OpenPoseSkeleton3D') + repmat(ret_t, 1, n);
 openpose_transformed = openpose_transformed';
+%perform the rotation/translation also on the ICP points (for error calculation)
+match_transformed = (ret_R*openposematch')+repmat(ret_t,1,14);
+match_transformed = match_transformed';
 
+err = match_transformed - kinectmatch;
+err = err .* err;
+err = sum(err(:));
+rmse = sqrt(err/n)
 
 OP_start2 = openpose_transformed(1:2:end,:);
 OP_end2 = openpose_transformed(2:2:end,:);
