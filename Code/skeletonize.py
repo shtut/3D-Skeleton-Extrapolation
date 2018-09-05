@@ -11,14 +11,16 @@ import sys
 import ast
 import scipy.io as sio
 import kinect_mapping
+import cv2
 
 # adjust this to reflect where you have tf-openpose
 # sys.path.append(r'../tf-openpose')
 # sys.path.append(r'../../tf-openpose/src')
+sys.path.append(r'../../../tf-openpose/src')
 # sys.path.append(r'../tf-openpose/src')
 # sys.path.append(r'tf-openpose/src')
-sys.path.append(r'E:\cygwin64\home\Alex\git\tf-openpose\src')
-sys.path.append(r'E:\cygwin64\home\Alex\git\tf-openpose')
+# sys.path.append(r'E:\cygwin64\home\Alex\git\tf-openpose\src')
+# sys.path.append(r'E:\cygwin64\home\Alex\git\tf-openpose')
 import common
 from estimator import TfPoseEstimator
 from networks import get_graph_path, model_wh
@@ -26,8 +28,6 @@ import matlab.engine
 # disable scientific notation
 np.set_printoptions(suppress=True)
 
-# this line starts matlab in the background so it takes a while
-eng = matlab.engine.start_matlab()
 
 class Skeletonizer(object):
     def __init__(self, calibration_file):
@@ -94,9 +94,9 @@ class Skeletonizer(object):
         right_image_parts = []
         indexes = {}
         i = 0
-		
-		# assuming im1 and im2 are the same size
-		height,width,_ = cv2.imread(im1).shape
+
+        # assuming im1 and im2 are the same size
+        height,width,_ = cv2.imread(im1).shape
 
         part_order = []
         part_order_vis = []
