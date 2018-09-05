@@ -38,6 +38,7 @@ OPknee2 = OpenPoseSkeleton3D(find(contains(orderOP,"RKnee"),1,'first'),:);
 OPfoot1 = OpenPoseSkeleton3D(find(contains(orderOP,"LAnkle"),1,'first'),:);
 OPfoot2 = OpenPoseSkeleton3D(find(contains(orderOP,"RAnkle"),1,'first'),:);
 
+
 Khead = kinect.lines(find(contains(orderK,"Neck"),1,'first'),:);
 Kneck = kinect.lines(find(contains(orderK,"SpineShoulder"),1,'first'),:);
 Kshoulder1 = kinect.lines(find(contains(orderK,"ShoulderLeft"),1,'first'),:);
@@ -59,41 +60,20 @@ kinectmatch = [Khead ;Kneck ;Kshoulder1 ;Kshoulder2 ;Kelbow1 ;Kelbow2 ;Khand1 ;K
 % remove center of mass from all the points (move to 0,0)
 center = mean(openposematch);
 openposematch = openposematch - center;
-openposematch = pointCloud(openposematch);
 
 center = mean(kinectmatch);
 kinectmatch = kinectmatch - center;
-kinectmatch = pointCloud(kinectmatch);
 
-
-% OP_start2 = openposematch.Location(1:2:end,:);
-% OP_end2 = openposematch.Location(2:2:end,:);
-% 
-% kinect_start = kinectmatch.Location(1:2:end,:);
-% kinect_end = kinectmatch.Location(2:2:end,:);
 
 %calc transformation via icp
-tform = pcregrigid(openposematch,kinectmatch,'Extrapolate',true);
-%apply the transformation
-openpose_transformed = pctransform(pointCloud(OpenPoseSkeleton3D),tform);
-openpose_transformed = openpose_transformed.Location;
+[ret_R, ret_t] = rigidTransform3D(openposematch, kinectmatch);
+[n,x] = size(OpenPoseSkeleton3D);
+openpose_transformed = (ret_R*OpenPoseSkeleton3D') + repmat(ret_t, 1, n);
+openpose_transformed = openpose_transformed';
+
 
 OP_start2 = openpose_transformed(1:2:end,:);
 OP_end2 = openpose_transformed(2:2:end,:);
-
-
-
-% OPfoot = OpenPoseSkeleton3D(find(contains(orderOP,"LAnkle"),1,'first'),:);
-% % find the rotation matrix
-% r = vrrotvec(Kfoot,OPfoot);
-% m = vrrotvec2mat(r);
-% OP_end2 = OP_end * m; OP_start2 = OP_start * m;
-% % 
-% % find the scaling factor
-% OPfoot_postR = OPfoot * m;
-% Kfoot_postR = Kfoot * m;
-% scale = (norm(Kfoot_postR - [0,0,0]))/(norm(OPfoot_postR - [0,0,0]));
-% OP_end2 = OP_end2 * scale; OP_start2 = OP_start2 * scale;
 
 % Concat each start and end point to [[start, end] ,...[start, end]] list
 %  then  plot 3D points on viewer with 
@@ -104,7 +84,7 @@ for elm = transpose(cat(2, OP_start2,OP_end2))
     scatter3([elm(1);elm(4)], [elm(2);elm(5)], [elm(3);elm(6)],'MarkerFaceColor',[255, 153, 51] / 255, 'MarkerEdgeColor','none');
 	hold on;
 	grid on;
-    % height limited to +/-3m, width to +/-2m, depth to +/-1m
+    % height limited to +/-5m, width to +/-5m, depth to +/-5m
     axis([-5 5 -5 5 -5 5]);
 end
 for elm = transpose(cat(2, kinect_start,kinect_end))

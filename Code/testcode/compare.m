@@ -37,6 +37,7 @@ orderOP = cellstr(orderOP);
 % OPknee2 = OpenPoseSkeleton3D(find(contains(orderOP,"RKnee"),1,'first'),:);
 % OPfoot1 = OpenPoseSkeleton3D(find(contains(orderOP,"LAnkle"),1,'first'),:);
 % OPfoot2 = OpenPoseSkeleton3D(find(contains(orderOP,"RAnkle"),1,'first'),:);
+%%%%%%%%%%test OP
 OPhead = OpenPoseSkeleton3D(find(contains(orderOP,"head"),1,'first'),:);
 OPneck = OpenPoseSkeleton3D(find(contains(orderOP,"neck"),1,'first'),:);
 OPshoulder1 = OpenPoseSkeleton3D(find(contains(orderOP,"shoulder1"),1,'first'),:);
@@ -73,12 +74,11 @@ kinectmatch = [Khead ;Kneck ;Kshoulder1 ;Kshoulder2 ;Kelbow1 ;Kelbow2 ;Khand1 ;K
 % remove center of mass from all the points (move to 0,0)
 center = mean(openposematch);
 openposematch = openposematch - center;
-openposematch = pointCloud(openposematch);
+% openposematch = pointCloud(openposematch);
 
 center = mean(kinectmatch);
 kinectmatch = kinectmatch - center;
-kinectmatch = pointCloud(kinectmatch);
-
+% kinectmatch = pointCloud(kinectmatch);
 
 % OP_start2 = openposematch.Location(1:2:end,:);
 % OP_end2 = openposematch.Location(2:2:end,:);
@@ -87,10 +87,20 @@ kinectmatch = pointCloud(kinectmatch);
 % kinect_end = kinectmatch.Location(2:2:end,:);
 
 %calc transformation via icp
-tform = pcregrigid(openposematch,kinectmatch,'Extrapolate',true);
+% [tform, openpose_transformed, error] = pcregrigid(openposematch,kinectmatch);
+[ret_R, ret_t] = rigidTransform3D(openposematch, kinectmatch);
+[n,x] = size(OpenPoseSkeleton3D);
+openpose_transformed = (ret_R*OpenPoseSkeleton3D') + repmat(ret_t, 1, n);
+openpose_transformed = openpose_transformed';
 %apply the transformation
-openpose_transformed = pctransform(pointCloud(OpenPoseSkeleton3D),tform);
-openpose_transformed = openpose_transformed.Location;
+% tform = tform.invert;
+% tform = transpose(tform);
+% 
+% 
+% openpose_transformed = pctransform(pointCloud(OpenPoseSkeleton3D),tform);
+% openpose_transformed = openpose_transformed.Location;
+
+
 
 OP_start2 = openpose_transformed(1:2:end,:);
 OP_end2 = openpose_transformed(2:2:end,:);
