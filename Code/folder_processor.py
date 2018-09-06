@@ -1,3 +1,6 @@
+# Alex Nulman, Dvir Segal and Hadas Shahar [05-Sep-2018]
+# loops over two given folder content and traingulate between each image pair.
+# The assumption that images are ordered equally, it generates a 3D skeleton per image pair and saves it to disk
 
 import argparse
 from glob import glob
