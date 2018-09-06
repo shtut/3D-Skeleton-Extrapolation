@@ -57,6 +57,15 @@ Kfoot2 = kinect.lines(find(contains(orderK,"AnkleRight"),1,'first'),:);
 openposematch = [OPhead ;OPneck ;OPshoulder1 ;OPshoulder2 ;OPelbow1 ;OPelbow2 ;OPhand1 ;OPhand2 ;OPhip1 ;OPhip2 ;OPknee1 ;OPknee2 ;OPfoot1 ;OPfoot2];
 kinectmatch = [Khead ;Kneck ;Kshoulder1 ;Kshoulder2 ;Kelbow1 ;Kelbow2 ;Khand1 ;Khand2 ;Khip1 ;Khip2 ;Kknee1 ;Kknee2 ;Kfoot1 ;Kfoot2];
 
+
+sizediff = size(kinectmatch) - size(openposematch);
+sizediff = sizediff(1);
+if(sizediff > 0)
+    for i = 1:sizediff
+        openposematch = [openposematch; ones(1,3)];
+
+    end
+end
 % remove center of mass from all the points (move to 0,0)
 center = mean(openposematch);
 openposematch = openposematch - center;
