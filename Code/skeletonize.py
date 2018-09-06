@@ -14,13 +14,11 @@ import kinect_mapping
 import cv2
 
 # adjust this to reflect where you have tf-openpose
-# sys.path.append(r'../tf-openpose')
-# sys.path.append(r'../../tf-openpose/src')
+sys.path.append(r'../tf-openpose/src')
+sys.path.append(r'../../tf-openpose/src')
 sys.path.append(r'../../../tf-openpose/src')
-# sys.path.append(r'../tf-openpose/src')
-# sys.path.append(r'tf-openpose/src')
-# sys.path.append(r'E:\cygwin64\home\Alex\git\tf-openpose\src')
-# sys.path.append(r'E:\cygwin64\home\Alex\git\tf-openpose')
+sys.path.append(r'./tf-openpose/src')
+
 import common
 from estimator import TfPoseEstimator
 from networks import get_graph_path, model_wh
@@ -163,22 +161,30 @@ class Skeletonizer(object):
 
 
 if __name__ == '__main__':
-    # perpare the file inputs
-    im1 = r'../data/Original/Test/2/-8586670814794339271%1457984245925.png'
-    im2 = r'../data/Original/Test/2/-8586670814803766057%2226553340049.png'
-    kinect_text = r'../data/Original/Test/2/-8586670814803766057%2226553277549.TXT'
-    calibration = 'example/aug17_stereoParams.mat'
+    import argparse
+    parser = argparse.ArgumentParser(description='skeletonize demo')
+    parser.add_argument('--calibration', type=str, help='path to calibration file',
+                        default='example/aug17_stereoParams.mat')
+    parser.add_argument('--img1', type=str, help='path to first image file',
+                        default=r'../data/Original/Test/0/-8586670814778381942%1458000246174.png')
+    parser.add_argument('--img2', type=str, help='path to second image file (the has a kinect text file)',
+                        default=r'../data/Original/Test/0/-8586670814788377494%2226568669020.png')
+    parser.add_argument('--kinect', type=str, help='path to kinect text file matching the 2nd image',
+                        default=r'../data/Original/Test/0/-8586670814788377494%2226568606520.TXT')
+    parser.add_argument('--out', type=str, default='skeleton_dump', help='output file name')
+
+    args = parser.parse_args()
 
     #initilize our class and matlab engine (runs headless matlab)
-    sk = Skeletonizer(calibration)
+    sk = Skeletonizer(args.calibration)
     #generate a skeleton map for visualization and the join point map
-    file_for_vis, point_file = sk.prepare_op_data(im1, im2)
+    file_for_vis, point_file = sk.prepare_op_data(args.img1, args.img2)
     #parse the kinect skeleton text into our data format
-    kin_out_file = kinect_mapping.get_skeleton(kinect_text)
+    kin_out_file = kinect_mapping.get_skeleton(args.kinect)
     #runs the matlab visualization
     sk.visualize(file_for_vis, kin_out_file)
     #turns our 2d point cloud intoa 3d point cloud
     triangulated_points = sk.get_triangulated_points(point_file)
     # save the cloud in the same format as the kinect text
-    sk.save_text(triangulated_points, 'skeleton_dump.txt')
+    sk.save_text(triangulated_points, args.out + '.txt')
     input("Press Enter to continue...")
