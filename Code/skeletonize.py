@@ -34,8 +34,8 @@ class Skeletonizer(object):
         """
         args = type('', (), {})
         # args.resolution = '1312x736'
-        args.resolution = '656x368'
-        args.model = 'cmu'
+        args.resolution = '432x368'
+        args.model = 'mobilenet_thin'
         args.scales = '[None]'
         scales = ast.literal_eval(args.scales)
         w, h = model_wh(args.resolution)
@@ -166,11 +166,11 @@ if __name__ == '__main__':
     parser.add_argument('--calibration', type=str, help='path to calibration file',
                         default='example/aug17_stereoParams.mat')
     parser.add_argument('--img1', type=str, help='path to first image file',
-                        default=r'../data/Original/Test/0/-8586670814778381942%1458000246174.png')
+                        default=r'../data/Original/Test/-8586670814778381942%1458000246174__.png')
     parser.add_argument('--img2', type=str, help='path to second image file (the has a kinect text file)',
-                        default=r'../data/Original/Test/0/-8586670814788377494%2226568669020.png')
+                        default=r'../data/Original/Test/-8586670814788377494%2226568669020__.png')
     parser.add_argument('--kinect', type=str, help='path to kinect text file matching the 2nd image',
-                        default=r'../data/Original/Test/0/-8586670814788377494%2226568606520.TXT')
+                        default=r'../data/Original/Test/-8586670814788377494%2226568606520.TXT')
     parser.add_argument('--out', type=str, default='skeleton_dump', help='output file name')
 
     args = parser.parse_args()
