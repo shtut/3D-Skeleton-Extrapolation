@@ -52,3 +52,12 @@ triangulateOpenpose(calibration, fig)
 given calibration, and a figure containing 2 OpenPose skeletons (2D) - generates a 3D OpenPose skeleton
 calibration - name of the calibraion file containing matrices for the 2 cameras (stereo)
 fig - name of the text file containing both skeletons
+
+rigidTransform3D.m
+This function finds the optimal Rigid/Euclidean transform in 3D space
+It expects as input a Nx3 matrix of 3D points.
+It returns R, t
+
+folder_processor.py
+loops over two given folder content and traingulate between each image pair.
+The assumption that images are ordered equally, it generates a 3D skeleton per image pair and saves it to disk
